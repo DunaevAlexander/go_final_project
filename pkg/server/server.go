@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"go_final_project/pkg/api"
 )
 
 const (
@@ -17,9 +19,9 @@ func Run() error {
 		port = defaultPort
 	}
 
-	mux := http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.Dir(webDir)))
+	api.Init()
+	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
 	log.Printf("Server started on :%s", port)
-	return http.ListenAndServe(":"+port, mux)
+	return http.ListenAndServe(":"+port, nil)  // nil → DefaultServeMux
 }
