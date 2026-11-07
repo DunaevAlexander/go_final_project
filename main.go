@@ -17,6 +17,11 @@ func main() {
 	if err := db.Init(dbFile); err != nil {
 		log.Fatalf("db init: %v", err)
 	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Printf("db close: %v", err)
+		}
+	}()
 
 	if err := server.Run(); err != nil {
 		log.Fatal(err)

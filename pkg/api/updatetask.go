@@ -10,29 +10,29 @@ import (
 func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-		writeError(w, "invalid json: "+err.Error())
+		writeError(w, http.StatusBadRequest, "invalid json: "+err.Error())
 		return
 	}
 
 	if task.ID == "" {
-		writeError(w, "Не указан идентификатор")
+		writeError(w, http.StatusBadRequest, "Не указан идентификатор")
 		return
 	}
 
 	if task.Title == "" {
-		writeError(w, "Не указан заголовок задачи")
+		writeError(w, http.StatusBadRequest, "Не указан заголовок задачи")
 		return
 	}
 
 	if err := checkDate(&task); err != nil {
-		writeError(w, err.Error())
+		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := db.UpdateTask(&task); err != nil {
-		writeError(w, "Задача не найдена")
+		writeError(w, http.StatusNotFound, "Задача не найдена")
 		return
 	}
 
-	writeJSON(w, map[string]any{})
+	writeJSON(w, http.StatusOK, map[string]any{})
 }

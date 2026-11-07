@@ -11,6 +11,11 @@ import (
 const dateFormat = "20060102"
 
 func nextDayHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Метод не поддерживается")
+		return
+	}
+
 	nowStr := r.FormValue("now")
 	var now time.Time
 	if nowStr == "" {
@@ -19,7 +24,7 @@ func nextDayHandler(w http.ResponseWriter, r *http.Request) {
 		var err error
 		now, err = time.Parse(dateFormat, nowStr)
 		if err != nil {
-			http.Error(w, "invalid now: "+err.Error(), http.StatusBadRequest)
+			writeError(w, http.StatusBadRequest, "invalid now: "+err.Error())
 			return
 		}
 	}
@@ -29,7 +34,7 @@ func nextDayHandler(w http.ResponseWriter, r *http.Request) {
 
 	next, err := NextDate(now, date, repeat)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	w.Write([]byte(next))
@@ -45,6 +50,10 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	}
 
 	parts := strings.Fields(repeat)
+	if len(parts) == 0 {
+		return "", fmt.Errorf("empty repeat")
+	}
+
 	switch parts[0] {
 	case "d":
 		return nextDaily(now, start, parts)
@@ -139,7 +148,8 @@ func nextMonthly(now, start time.Time, parts []string) (string, error) {
 	}
 
 	date := start
-	for {
+	limit := now.AddDate(5, 0, 0)
+	for date.Before(limit) {
 		if afterNow(date, now) &&
 			(len(months) == 0 || months[int(date.Month())]) &&
 			matchDay(date, days) {
@@ -147,6 +157,7 @@ func nextMonthly(now, start time.Time, parts []string) (string, error) {
 		}
 		date = date.AddDate(0, 0, 1)
 	}
+	return "", fmt.Errorf("no matching date found for rule %q", strings.Join(parts, " "))
 }
 
 func matchDay(date time.Time, days map[int]bool) bool {

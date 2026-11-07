@@ -49,3 +49,10 @@ func Init(dbFile string) error {
 	db = conn
 	return nil
 }
+
+func Close() error {
+	if db == nil {
+		return nil
+	}
+	return db.Close()
+}

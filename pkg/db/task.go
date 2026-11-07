@@ -90,7 +90,7 @@ func Tasks(limit int, search string) ([]*Task, error) {
 	if search != "" {
 		if t, err := time.Parse("02.01.2006", search); err == nil {
 			query += ` WHERE date = ?`
-			args = append(args, t.Format("20060102"))
+			args = append(args, t.Format("20060102"))	
 		} else {
 			query += ` WHERE title LIKE ? OR comment LIKE ?`
 			like := "%" + search + "%"

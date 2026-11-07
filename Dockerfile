@@ -13,7 +13,6 @@ WORKDIR /app
 COPY --from=build /app/go_final_project .
 COPY web ./web
 
-EXPOSE 7540
 ENV TODO_PORT=7540
 ENV TODO_DBFILE=/data/scheduler.db
 

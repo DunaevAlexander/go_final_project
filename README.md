@@ -42,7 +42,7 @@ go run .
 go test ./tests
 ```
 
-Параметры в `tests/settings.go` для сдачи: `FullNextDate = false`, `Search = false`.
+Параметры для заданий со * нужно включать тесты в `tests/settings.go`: `FullNextDate = false`, `Search = false`.
 Для полной проверки (правила `w`/`m` и поиск) временно поставьте `true` и верните
 обратно после прогона.
 
